@@ -1,0 +1,75 @@
+@page
+@model Windigo.Pages.TodoPageModel
+@{
+    ViewData["Title"] = "Todo List";
+}
+
+<h1>Todo List</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Is Complete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TodoItems)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.IsComplete</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Personal Todo List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Hobby</th>
+            <th>Is Complete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PersonalTodoItems)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Hobby</td>
+                <td>@item.IsComplete</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Work Todo List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>ProjectName</th>
+            <th>Is Complete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.WorkTodoItems)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.ProjectName</td>
+                <td>@item.IsComplete</td>
+            </tr>
+        }
+    </tbody>
+</table>
