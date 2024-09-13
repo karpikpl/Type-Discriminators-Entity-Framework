@@ -20,11 +20,27 @@ public class TodoContext : DbContext
             .ToTable("Todos")
             .HasKey(t => t.Id);
 
-        modelBuilder.Entity<TodoItem>()
-            .HasDiscriminator<int>("TodoTypeDiscriminator")
-            .HasValue<TodoItem>(0)
-            .HasValue<WorkTodoItem>(1)
-            .HasValue<PersonalTodoItem>(2);
+        // modelBuilder.Entity<TodoItem>()
+        //     .HasDiscriminator<int>("TodoTypeDiscriminator")
+        //     .HasValue<TodoItem>(0)
+        //     .HasValue<WorkTodoItem>(1)
+        //     .HasValue<PersonalTodoItem>(2);
+
+        // same thing with reflection:
+        var todoItemType = typeof(TodoItem);
+        var derivedTypes = todoItemType.Assembly.GetTypes()
+            .Where(p => todoItemType.IsAssignableFrom(p));
+
+        var discriminatorBuilder = modelBuilder.Entity<TodoItem>()
+            .HasDiscriminator<int>("TodoTypeDiscriminator");
+
+        foreach (var type in derivedTypes)
+        {
+            var instance = Activator.CreateInstance(type) as TodoItem;
+
+            discriminatorBuilder
+                .HasValue(type, instance!.TodoTypeDiscriminator);
+        }
 
         base.OnModelCreating(modelBuilder);
     }
