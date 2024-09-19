@@ -5,6 +5,8 @@ namespace Windigo.Data;
 
 public class TodoContext : DbContext
 {
+    private bool _modelInitialized = false;
+
     public TodoContext(DbContextOptions<TodoContext> options)
         : base(options)
     {
@@ -14,17 +16,23 @@ public class TodoContext : DbContext
     public DbSet<WorkTodoItem> WorkTodoItems { get; set; }
     public DbSet<PersonalTodoItem> PersonalTodoItems { get; set; }
 
+    public DbSet<ApplicationConfig> ApplicationConfigs { get; set; }
+    public DbSet<Plant> Plants { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        if (_modelInitialized)
+        {
+            // NOTE: if for any reason more than 1 context is created, this will prevent the model from being re-initialized
+            return;
+        }
+
+        modelBuilder.ApplyConfiguration(new ApplicationConfigConfiguration(modelBuilder));
+        modelBuilder.ApplyConfiguration(new PlantConfiguration(modelBuilder));
+
         modelBuilder.Entity<TodoItem>()
             .ToTable("Todos")
             .HasKey(t => t.Id);
-
-        // modelBuilder.Entity<TodoItem>()
-        //     .HasDiscriminator<int>("TodoTypeDiscriminator")
-        //     .HasValue<TodoItem>(0)
-        //     .HasValue<WorkTodoItem>(1)
-        //     .HasValue<PersonalTodoItem>(2);
 
         // same thing with reflection:
         var todoItemType = typeof(TodoItem);
@@ -43,5 +51,7 @@ public class TodoContext : DbContext
         }
 
         base.OnModelCreating(modelBuilder);
+
+        _modelInitialized = true;
     }
 }

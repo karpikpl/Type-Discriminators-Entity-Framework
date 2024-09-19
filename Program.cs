@@ -13,6 +13,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TodoContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("TodoConnectionString"));
+    options.EnableDetailedErrors();
+    options.EnableSensitiveDataLogging();
+    options.LogTo(Console.WriteLine, LogLevel.Trace);
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -40,8 +43,17 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<TodoContext>();
     context.Database.EnsureDeleted();
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<TodoContext>();
     context.Database.EnsureCreated();
-
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<TodoContext>();
     if (!context.TodoItems.Any())
     {
         context.TodoItems.AddRange(
@@ -69,8 +81,31 @@ using (var scope = app.Services.CreateScope())
             }
         );
 
+        var plant = new Plant { Name = "Cactus" };
+        context.Plants.Add(plant);
+        context.ApplicationConfigs.Add(new ApplicationConfig
+        {
+            Key = "DefaultSQLCommandTimeoutSeconds",
+            Value = "30",
+            Environment = 1,
+            Plant = plant,
+            Comment = "testing"
+        });
+
         context.SaveChanges();
     }
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<TodoContext>();
+
+    // get DefaultSQLCommandTimeoutSeconds
+    var config = context.ApplicationConfigs
+        .First(c => c.Key == "DefaultSQLCommandTimeoutSeconds");
+    
+    var commandTimeout = int.Parse(config.Value);
+    Console.WriteLine($"Command timeout: {commandTimeout}");
 }
 
 app.UseHttpsRedirection();
