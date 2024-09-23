@@ -1,0 +1,33 @@
+@page
+@model Windigo.Pages.ConfigPageModel
+@{
+    ViewData["Title"] = "Config List";
+}
+
+<h1>Config List</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Comment</th>
+            <th>Environment</th>
+            <th>Plant Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.AppConfigItems)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Key</td>
+                <td>@item.Value</td>
+                <td>@item.Comment</td>
+                <td>@item.Environment</td>
+                <td>@item.Plant.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
